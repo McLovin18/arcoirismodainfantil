@@ -11,7 +11,7 @@ export default function AdminPage() {
             Panel de administración
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-2">
-            Julietas Flowers - Florería Samborondón
+            Arcoiris- Moda infantil
           </p>
         </div>
 
