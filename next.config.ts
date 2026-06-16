@@ -128,7 +128,7 @@ const nextConfig: NextConfig = {
       // Redirigir URLs antiguas si las tienes
       {
         source: "/tienda",
-        destination: "/productos",
+        destination: "/",
         permanent: true,
       },
     ];

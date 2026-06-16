@@ -4,7 +4,6 @@ import { obtenerProductoPorId, obtenerProductosPorCategoria, obtenerProductosPor
 import { obtenerAtributos } from "../lib/atributos-db";
 import { Loading3DIcon } from "../components/Loading3DIcon";
 import ProductoCard from "../components/ProductoCard";
-import RelatedProductsCarousel from "../components/RelatedProductsCarousel";
 import VariationsManager from "../components/VariationsManager";
 import React, { useState, useEffect } from "react";
 import { ProductReview } from "../lib/reviews-types";
@@ -16,7 +15,6 @@ import dynamic from "next/dynamic";
 import { getCartItemKey } from "../context/userLocalStorage";
 import { getCatalogPricing } from "../lib/pricing";
 
-const Markdown = dynamic(() => import("../components/Markdown"), { ssr: false });
 
 export default function ProductDetailPage({ params }) {
   const [relacionados, setRelacionados] = useState([]);
@@ -446,7 +444,6 @@ export default function ProductDetailPage({ params }) {
                       {producto.caracteristicas.map((c, idx) => (
                         <li key={idx} className="flex items-start gap-2.5 text-sm text-black/80 dark:text-white/80">
                           <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-white/20 mt-2 flex-shrink-0" />
-                          <Markdown>{c}</Markdown>
                         </li>
                       ))}
                     </ul>
@@ -664,18 +661,6 @@ export default function ProductDetailPage({ params }) {
               </ul>
             )}
 
-            {/* Banner login */}
-            {!isLogged && (
-              <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-white/25 bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.04] rounded-xl px-3 py-2.5">
-                <span className="material-icons-round text-sm flex-shrink-0">info</span>
-                <span>
-                  Mejor experiencia al{" "}
-                  <a href="/login?tab=register" className="underline underline-offset-2 text-slate-600 dark:text-white/40 hover:text-slate-900 dark:hover:text-white/70 transition-colors">
-                    iniciar sesión
-                  </a>
-                </span>
-              </div>
-            )}
 
           </div>
 
@@ -729,7 +714,6 @@ export default function ProductDetailPage({ params }) {
                   {producto.caracteristicas.map((c, idx) => (
                     <li key={idx} className="flex items-start gap-2.5 text-sm text-black/80 dark:text-white/80">
                       <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-white/20 mt-2 flex-shrink-0" />
-                      <Markdown>{c}</Markdown>
                     </li>
                   ))}
                 </ul>
@@ -742,10 +726,6 @@ export default function ProductDetailPage({ params }) {
         </div>
         {/* ── FIN TABS móvil ───────────────────────────────────── */}
 
-      {/* Productos relacionados */}
-      <div className="max-w-7xl mx-auto w-full px-1 sm:px-3 pb-10">
-        <RelatedProductsCarousel productos={relacionados} title="Productos relacionados" />
-      </div>
     </div>
   );
 }

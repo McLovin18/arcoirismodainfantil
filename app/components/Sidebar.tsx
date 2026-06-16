@@ -4,15 +4,10 @@ import Link from "next/link";
 
 const Sidebar = ({ role = "admin" }) => {
   const adminItems = [
-    { name: "Dashboard", path: "/admin", icon: "dashboard" },
+    { name: "Inicio", path: "/admin", icon: "home" },
     { name: "Inventario", path: "/admin/inventario", icon: "inventory" },
-    { name: "Pedidos", path: "/admin/pedidos", icon: "assignment" },
-    { name: "Clientes", path: "/admin/clientes", icon: "people" },
     { name: "Reseñas", path: "/admin/reviews", icon: "rate_review" },
-    { name: "Editar landing", path: "/admin/edit-landing", icon: "edit" },
-    { name: "Editar blogs", path: "/admin/edit-blogs", icon: "library_books" },
-    { name: "Perfil", path: "/admin/perfil", icon: "person" },
-    { name: "Configuración", path: "/admin/config", icon: "settings" },
+    { name: "Mi perfil", path: "/admin/perfil", icon: "person" },
   ];
   const items = adminItems;
   return (

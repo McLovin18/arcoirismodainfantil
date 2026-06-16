@@ -8,7 +8,6 @@ import {
 	getIdTokenResult,
 	User,
 } from "firebase/auth";
-import { loginWithRateLimit } from "./device-id-client";
 
 // RECUPERAR CONTRASEÑA
 export async function sendPasswordResetEmail(email: string) {
@@ -18,10 +17,7 @@ export async function sendPasswordResetEmail(email: string) {
 // LOGIN
 export async function loginUser(email: string, password: string) {
 	try {
-		// 🔒 Rate limit + validar credenciales en backend
-		await loginWithRateLimit(email, password);
-		
-		// ✅ Luego: Login normal con Firebase SDK
+		// ✅ Login normal con Firebase SDK
 		const userCredential = await signInWithEmailAndPassword(auth, email, password);
 		const user = userCredential.user;
 
@@ -34,15 +30,6 @@ export async function loginUser(email: string, password: string) {
 
 		return { success: true, user, idToken };
 	} catch (error: any) {
-		// Si es error del rate limit o validación, propagar
-		if (
-			error.message.includes("Demasiados")
-			|| error.message.includes("Email")
-			|| error.message.includes("administrador")
-		) {
-			throw error;
-		}
-		// Otros errores de Firebase
 		throw new Error(error.message || "Error al iniciar sesión");
 	}
 }

@@ -7,7 +7,6 @@ import { UserProvider } from "./context/UserContext";
 import { OnboardingProvider } from "./context/OnboardingContext";
 import { ToastProvider } from "./context/ToastContext";
 import LayoutContentClient from "./components/LayoutContentClient";
-import { StructuredData } from "./components/StructuredData";
 import type { Metadata, Viewport } from "next";
 import { Source_Serif_4 } from "next/font/google";
 
@@ -15,8 +14,8 @@ import { Source_Serif_4 } from "next/font/google";
 // Optimiza regeneración de página principal y otros contenidos estáticos
 export const revalidate = 1800;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://julietas-flowers.com";
-const SITE_NAME = "Julietas Flowers";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://arcoiris-moda-infantil.com";
+const SITE_NAME = "Arcoíris Moda Infantil";
 const sourceSerif4 = Source_Serif_4({
   subsets: ["latin"],
   weight: ["400"],
@@ -26,22 +25,22 @@ const sourceSerif4 = Source_Serif_4({
 
 export const metadata: Metadata = {
   title: {
-    default: "Julietas Flowers - Florería en Samborondón | Rosas & Arreglos",
-    template: "%s | Julietas Flowers",
+    default: "Arcoíris Moda Infantil - Ropa de Bebés 0-24M | Ecuador",
+    template: "%s | Arcoíris Moda Infantil",
   },
   description:
-    "Florería Julietas en Samborondón, Guayaquil. Creamos emociones con cada flor. Rosas, arreglos personalizados, flores para todos los eventos. Envío a domicilio.",
+    "Arcoíris Moda Infantil - Ropa de bebés 0-24 meses con estilo y comodidad. Viste con estilo a tus pequeños. Envíos a todo Ecuador. Pedidos por WhatsApp.",
   keywords: [
-    "florería Guayaquil",
-    "flores Ecuador",
-    "rosas personalizadas",
-    "arreglos florales",
-    "flores Samborondón",
-    "envío flores",
-    "Julietas Flowers",
-    "flores para regalo",
+    "ropa bebés Ecuador",
+    "moda infantil",
+    "ropa 0-24 meses",
+    "bebé ropa Guayaquil",
+    "ropa niños Samborondón",
+    "envío ropa bebé",
+    "Arcoíris Moda",
+    "ropa infantil Ecuador",
   ],
-  creator: "Julietas Flowers",
+  creator: "Arcoíris Moda Infantil",
   metadataBase: new URL(SITE_URL),
   icons: {
     icon: "/favicon.ico",
@@ -56,9 +55,9 @@ export const metadata: Metadata = {
     locale: "es_ES",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: "Julietas Flowers - Florería en Samborondón",
+    title: "Arcoíris Moda Infantil - Ropa de Bebés",
     description:
-      "Creamos emociones con cada flor. Rosas, arreglos personalizados y flores para todos los eventos en Guayaquil.",
+      "Viste con estilo y comodidad a tus pequeños. Ropa de bebés 0-24M con envíos a todo Ecuador.",
     images: [
       {
         url: `${SITE_URL}/og-image.jpg`,
@@ -136,7 +135,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
-        <StructuredData />
       </head>
       <body className="relative">
         <ToastProvider>

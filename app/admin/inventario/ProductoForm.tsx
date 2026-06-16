@@ -6,7 +6,7 @@ import { obtenerProductos } from "../../lib/productos-db";
 import { useEffect } from "react";
 import { obtenerMarcas } from "../../lib/marcas-db";
 import { obtenerBodegas } from "../../lib/bodegas-db";
-import { obtenerAtributos, agregarValorAtributo } from "../../lib/atributos-db";
+import { obtenerAtributos } from "../../lib/atributos-db";
 import type { StockVariant } from "../../lib/productos-db";
 
 // Componente de formulario para crear/modificar productos
@@ -252,7 +252,7 @@ export default function ProductoForm({ initialData = null, onSave, onCancel }: P
     if (!value) return;
     agregarValorAtributo(id, value)
       .then(async () => {
-        const refreshed = await obtenerAtributos();
+        // const refreshed = await obtenerAtributos();
         setAtributos(refreshed);
       })
       .catch((err) => {

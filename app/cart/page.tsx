@@ -45,129 +45,6 @@ function resolveAvailableStock(item: any) {
   return Number(item.variantStock ?? item.stock ?? 0);
 }
 
-// --- Componente: Vista de Proforma
-function ProformaView({
-  orden,
-  email,
-  onConfirm,
-  onBack,
-  loading,
-}: {
-  orden: any;
-  email: string;
-  onConfirm: () => void;
-  onBack: () => void;
-  loading: boolean;
-}) {
-  return (
-    <div className="min-h-screen bg-white dark:bg-[#3a1859] text-slate-900 dark:text-white transition-colors">
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <div className="rounded-2xl overflow-hidden shadow-xl mb-6">
-          <div className="bg-linear-to-r from-[#3a1859] to-[#6d28d9] px-8 py-6 flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-extrabold text-white tracking-wide">Marca Estilo</h1>
-              <p className="text-purple-200 text-sm mt-1">Proforma de Orden</p>
-            </div>
-            <div className="text-right">
-              <p className="text-[#f5d890] text-xs">Numero de orden</p>
-              <p className="text-white text-xl font-bold">{orden.orderId}</p>
-            </div>
-          </div>
-          <div className="bg-slate-50 dark:bg-slate-800 px-8 py-4 flex flex-wrap gap-6 text-sm border-b border-slate-200 dark:border-slate-700">
-            <div>
-              <span className="text-slate-500 dark:text-slate-400">Fecha de visita</span>
-              <p className="font-semibold mt-0.5">{orden.visitaFecha}</p>
-            </div>
-            <div>
-              <span className="text-slate-500 dark:text-slate-400">Hora aproximada</span>
-              <p className="font-semibold mt-0.5">{orden.visitaHora}</p>
-            </div>
-            <div>
-              <span className="text-slate-500 dark:text-slate-400">Correo de envio</span>
-              <p className="font-semibold mt-0.5">{email}</p>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-slate-900 px-8 py-4">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm min-w-150">
-                <thead>
-                  <tr className="border-b-2 border-slate-200 dark:border-slate-700">
-                    <th className="text-left py-2 text-slate-500 dark:text-slate-400 font-semibold">Producto</th>
-                    <th className="text-center py-2 text-slate-500 dark:text-slate-400 font-semibold">Cant.</th>
-                    <th className="text-right py-2 text-slate-500 dark:text-slate-400 font-semibold">Precio unit.</th>
-                    <th className="text-right py-2 text-slate-500 dark:text-slate-400 font-semibold">Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orden.productos.map((p: any, i: number) => {
-                    const basePrice = Number(p.precioBase || p.precio || 0);
-                    const discount = Number(p.descuento || 0);
-                    const hasDiscount = !isNaN(discount) && discount > 0 && discount < 100;
-                    const fakeOldPrice = hasDiscount ? basePrice : null;
-                    const finalPrice = hasDiscount ? Math.round(basePrice * (1 - discount / 100) * 100) / 100 : basePrice;
-                    return (
-                      <tr key={i} className="border-b border-slate-100 dark:border-slate-800">
-                        <td className="py-3 pr-4 font-medium">{p.nombre}</td>
-                        <td className="py-3 text-center">{p.cantidad}</td>
-                        <td className="py-3 text-right">
-                          {hasDiscount && (
-                            <span className="text-xs line-through text-slate-400 mr-1">
-                              ${fakeOldPrice?.toFixed(2)}
-                            </span>
-                          )}
-                            <span className="text-slate-900 dark:text-white font-semibold">
-                            ${finalPrice.toFixed(2)}
-                          </span>
-                          {hasDiscount && (
-                            <span className="ml-1 text-xs text-red-600 bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 rounded-full">
-                              -{discount}%
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-3 text-right font-bold">
-                          ${(finalPrice * Number(p.cantidad || 1)).toFixed(2)}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-            <div className="mt-4 space-y-1 text-sm">
-              <div className="flex justify-between text-slate-500 dark:text-slate-400">
-                <span>Envio</span>
-                <span className="text-green-600 font-semibold">Gratis</span>
-              </div>
-              <div className="flex justify-between text-lg font-extrabold text-[#3a1859] dark:text-white pt-2 border-t border-slate-200 dark:border-slate-700">
-                <span>Total</span>
-                <span>${Number(orden.total).toFixed(2)}</span>
-              </div>
-            </div>
-          </div>
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border-t border-yellow-200 dark:border-yellow-700 px-8 py-4 text-sm text-yellow-800 dark:text-yellow-200">
-            Al confirmar, recibiras esta proforma en tu correo <strong>{email}</strong>. Presenta el numero <strong>{orden.orderId}</strong> al visitar el local.
-          </div>
-        </div>
-        <div className="flex gap-3">
-          <button
-            onClick={onBack}
-            disabled={loading}
-            className="flex-1 py-3 rounded-xl border-2 border-slate-300 dark:border-slate-600 font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition disabled:opacity-50"
-          >
-            Volver al carrito
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={loading}
-            className="flex-1 py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white font-extrabold text-lg shadow-lg border-2 border-green-700 transition disabled:opacity-60"
-          >
-            {loading ? "Enviando..." : "Confirmar y enviar al correo"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // --- Pagina principal del carrito
 export default function CartPage() {
@@ -176,11 +53,6 @@ export default function CartPage() {
   const user = userRaw as any;
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [visitDate, setVisitDate] = useState("");
-  const [visitTime, setVisitTime] = useState("");
-  const [email, setEmail] = useState("");
-  const [step, setStep] = useState<"cart" | "proforma">("cart");
-  const [ordenCreada, setOrdenCreada] = useState<any>(null);
   const router = useRouter();
   const { isLogged } = useUser();
   const [atributos, setAtributos] = useState<any[]>([]);
@@ -200,85 +72,14 @@ export default function CartPage() {
 }, []);
 
 
-  const handleVerProforma = async () => {
-    setError("");
-    if (!visitDate || !visitTime) {
-      setError("Selecciona el día y la hora aproximada en que irás al local.");
-      return;
-    }
-    if (!email || email.trim() === "" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setError("Ingresa un correo electrónico válido para recibir la proforma.");
-      return;
-    }
-    for (const p of carrito) {
-      const availableStock = resolveAvailableStock(p);
-      if (p.cantidad > availableStock) {
-        setError(`Solo hay ${availableStock} unidades disponibles de "${p.nombre}".`);
-        return;
-      }
-    }
-    setLoading(true);
-    try {
-      const res = await fetch("/api/ordenes/crear", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: null,
-          email: email.trim(),
-          productos: carrito.map((p) => ({
-            id: p.id,
-            cantidad: p.cantidad,
-            cartKey: p.cartKey || p.id,
-            selectedTalla: p.selectedTalla,
-            selectedColor: p.selectedColor,
-            selectedVariations: p.selectedVariations,
-            variationAttributeIds: p.variationAttributeIds,
-          })),
-          visitDate,
-          visitTime,
-        }),
-      });
 
-      const data = await res.json();
-      
-      if (!res.ok) {
-        throw new Error(data.error || "Error al generar la orden");
-      }
-
-      setOrdenCreada(data.orden);
-      setStep("proforma");
-    } catch (e: any) {
-      console.error("Error al generar proforma:", e);
-      setError(e.message || "Error al generar la orden. Intenta de nuevo.");
-    }
-    setLoading(false);
-  };
-
-  const handleConfirmar = async () => {
-    setLoading(true);
-    try {
-      await fetch("/api/send-proforma", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orden: ordenCreada, email: email.trim() }),
-      });
-      carrito.forEach((p) => removeCarrito(resolveCartItemKey(p)));
-      router.push(`/order-confirmation?orderId=${ordenCreada.orderId}`);
-    } catch (e) {
-      console.error("Error al enviar proforma:", e);
-      carrito.forEach((p) => removeCarrito(resolveCartItemKey(p)));
-      router.push(`/order-confirmation?orderId=${ordenCreada?.orderId || ""}`);
-    }
-    setLoading(false);
-  };
 
   const subtotal = carrito.reduce((sum, p) => {
     const { finalPrice } = calcularPrecioData(p);
     return sum + finalPrice * (p.cantidad || 1);
   }, 0);
   
-  const costoEnvio = 5;
-  const total = subtotal + costoEnvio;
+  const total = subtotal;
 
   const generateWhatsAppMessage = async (): Promise<string> => {
     const bodegas = await obtenerBodegas();
@@ -294,10 +95,7 @@ export default function CartPage() {
     const headerMsg = "Hola, Me gustaría realizar una compra:";
     const footerMsg = "Quiero confirmar disponibilidad y conocer más detalles. Gracias!";
     
-    // Para WhatsApp, solo incluir subtotal + envío
-    const totalWhatsApp = subtotal + costoEnvio;
-    
-    const message = `${headerMsg}\n\n${productosText}\n\n???????????????\nTOTAL: $${totalWhatsApp.toFixed(2)}\n???????????????\n\n${footerMsg}`;
+    const message = `${headerMsg}\n\n${productosText}\n\n???????????????\nTOTAL: $${subtotal.toFixed(2)}\n???????????????\n\n${footerMsg}`;
     return encodeURIComponent(message);
   };
 
@@ -305,11 +103,6 @@ export default function CartPage() {
     const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "0962873167";
     const message = await generateWhatsAppMessage();
     window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
-  };
-
-  const handlePagarAhora = () => {
-    setError("");
-    router.push("/checkout");
   };
 
   const handleCantidad = (id: string, cantidad: number) => {
@@ -328,18 +121,6 @@ export default function CartPage() {
       addCarrito({ ...prod, cantidad });
     }
   };
-
-  if (step === "proforma" && ordenCreada) {
-    return (
-      <ProformaView
-        orden={ordenCreada}
-        email={email}
-        onConfirm={handleConfirmar}
-        onBack={() => setStep("cart")}
-        loading={loading}
-      />
-    );
-  }
 
   const EmptyCart = () => (
     <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
@@ -510,12 +291,6 @@ export default function CartPage() {
                         </span>
                         <span>${subtotal.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between text-sm text-slate-500 dark:text-slate-400">
-                        <span>Envío</span>
-                        <span className="text-slate-900 dark:text-white font-medium">
-                          ${costoEnvio.toFixed(2)}
-                        </span>
-                      </div>
                       <div className="text-xs text-slate-400 dark:text-slate-500">
                         Recargo del 7% (solo aplica pago con tarjetas)
                       </div>
@@ -526,14 +301,6 @@ export default function CartPage() {
                         ${total.toFixed(2)}
                       </span>
                     </div>
-                    <a
-                      href="/politicas/politicasEnvio"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="block text-xs text-[#E0A11A] hover:underline mt-2"
-                    >
-                      Ver políticas de envío
-                    </a>
                   </div>
 
                   <div>
@@ -550,16 +317,6 @@ export default function CartPage() {
                     <p className="text-xs text-slate-400 dark:text-slate-500 text-center mt-2">
                       Te enviaremos el resumen del pedido por WhatsApp
                     </p>
-                  </div>
-
-                  <div>
-                    <button
-                      onClick={handlePagarAhora}
-                      className="w-full flex items-center justify-center gap-2 py-3.5 px-6 font-bold text-sm rounded-xl transition-colors shadow-md border bg-[#E0A11A] border-[#c88c0a] text-white hover:bg-[#c88c0a] hover:shadow-lg"
-                      title="Pagar ahora"
-                    >
-                      Pagar ahora
-                    </button>
                   </div>
                 </div>
               </div>

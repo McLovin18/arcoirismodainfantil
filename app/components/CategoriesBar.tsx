@@ -8,11 +8,9 @@ import {
   sortCategoriasByOrder,
 } from "../lib/categorias-db";
 import { useUser } from "../context/UserContext";
-import { useTracking } from "../lib/useAnalytics";
 
 const CategoriesBar = () => {
   const { isAdmin, user } = useUser();
-  const { trackCategoryClick } = useTracking();
 
   // Esperar a que cargue el usuario
   if (typeof user === "undefined") return null;

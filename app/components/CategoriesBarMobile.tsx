@@ -9,14 +9,11 @@ import {
   sortCategoriasByOrder,
 } from "../lib/categorias-db";
 import { useUser } from "../context/UserContext";
-import { useTracking } from "../lib/useAnalytics";
 
 const CategoriesBarMobile = () => {
   const [categorias, setCategorias] = useState<any[]>([]);
   const [openCategory, setOpenCategory] = useState<string | null>(null);
   const [openSubcategory, setOpenSubcategory] = useState<string | null>(null);
-  const { trackCategoryClick } = useTracking();
-
   const { isAdmin, user } = useUser();
   if (typeof user === "undefined") return null;
   const basePath = isAdmin
@@ -38,7 +35,6 @@ const CategoriesBarMobile = () => {
             {!category.subcategorias?.length ? (
               <Link
                 href={`${basePath}?cat=${category.id}`}
-                onClick={() => trackCategoryClick().catch(console.error)}
                 className="w-full flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 transition-colors text-sm font-medium"
               >
                 {category.icono && (
@@ -100,9 +96,6 @@ const CategoriesBarMobile = () => {
                               <Link
                                 key={subsubcat.id}
                                 href={`${basePath}?cat=${category.id}&sub=${subcat.id}&subsub=${subsubcat.id}`}
-                                onClick={() =>
-                                  trackCategoryClick().catch(console.error)
-                                }
                                 className="block px-3 py-2 rounded text-xs hover:bg-slate-200 dark:hover:bg-slate-700"
                               >
                                 {subsubcat.nombre}
@@ -114,9 +107,6 @@ const CategoriesBarMobile = () => {
                     ) : (
                       <Link
                         href={`${basePath}?cat=${category.id}&sub=${subcat.id}`}
-                        onClick={() =>
-                          trackCategoryClick().catch(console.error)
-                        }
                         className="block px-3 py-2 rounded text-xs hover:bg-slate-200 dark:hover:bg-slate-700"
                       >
                         {subcat.nombre}

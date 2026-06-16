@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useUser } from "../context/UserContext";
 import { useRouter } from "next/navigation";
-import { useTracking } from "../lib/useAnalytics";
 import { useToast } from "../context/ToastContext";
 import { getCatalogPricing } from "../lib/pricing";
 
@@ -32,34 +31,37 @@ const cardStyles = `
     flex-direction: column;
     width: 100%;
     height: 100%;
-    background: #ffff;
+    background: #ffffff;
     overflow: hidden;
     cursor: pointer;
-    border: 1px solid transparent;
-    transition: border-color 0.25s, box-shadow 0.25s;
+    border: 2px solid transparent;
+    border-radius: 16px;
+    transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+    box-shadow: 0 4px 12px rgba(255, 105, 180, 0.1);
   }
 
   .pc-card:hover {
-    border-color: #d4af37;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    border-color: #FF69B4;
+    box-shadow: 0 8px 24px rgba(255, 105, 180, 0.25);
+    transform: translateY(-4px);
   }
 
-  /* ── imagen ── */
+/* ── imagen ── */
+.pc-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 200px;          /* ← altura fija, sin aspect-ratio */
+  background: linear-gradient(135deg, rgba(255, 105, 180, 0.05) 0%, rgba(255, 184, 77, 0.05) 100%);
+  overflow: hidden;
+  flex-shrink: 0;
+  border-radius: 12px;
+}
+
+@media (min-width: 640px) {
   .pc-img-wrap {
-    position: relative;
-    width: 100%;
-    /* aspect-ratio cuadrado en mobile, más alto en desktop */
-    aspect-ratio: 1 / 1.05;
-    background: #fffff;
-    overflow: hidden;
-    flex-shrink: 0;
+    height: 240px;        /* ← más alta en desktop, también fija */
   }
-
-  @media (min-width: 640px) {
-    .pc-img-wrap {
-      aspect-ratio: 3 / 3.8;
-    }
-  }
+}
 
   .pc-img-wrap img {
     object-fit: contain !important;
@@ -77,14 +79,15 @@ const cardStyles = `
     top: 10px;
     left: 10px;
     z-index: 10;
-    background: #e63946;
+    background: #EF4444;
     color: #fff;
     font-family: 'Barlow', sans-serif;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
-    letter-spacing: 0.06em;
-    padding: 3px 8px;
-    border-radius: 2px;
+    letter-spacing: 0.05em;
+    padding: 6px 12px;
+    border-radius: 50px;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
   }
 
   /* ── sin stock overlay ── */
@@ -144,15 +147,16 @@ const cardStyles = `
     transform: scale(1);
   }
 
-  /* ── barra info inferior — estilo imagen: negro total ── */
+  /* ── barra info inferior — estilo limpio ── */
   .pc-info {
-    background: #0a0a0a;
-    color: #fff;
-    padding: 10px 12px 12px;
+    background: #FFFFFF;
+    color: #1F2937;
+    padding: 14px 12px 12px;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 6px;
     flex: 1;
+    border-top: 1px solid #E5E7EB;
   }
 
   @media (min-width: 640px) {
@@ -161,22 +165,19 @@ const cardStyles = `
     }
   }
 
-  /* nombre — cursiva serif como en la imagen */
+  /* nombre — bold negro ── */
   .pc-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-weight: 600;
+    font-family: 'Barlow', sans-serif;
+    font-weight: 700;
     font-size: 13px;
-    line-height: 1.25;
-    color: #ffffff;
+    line-height: 1.3;
+    color: #1F2937;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    text-decoration-thickness: 1px;
-    text-decoration-color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   @media (min-width: 640px) {
@@ -197,22 +198,22 @@ const cardStyles = `
   .pc-price-final {
     font-family: 'Barlow', sans-serif;
     font-weight: 700;
-    font-size: 13px;
-    color: #ffffff;
+    font-size: 14px;
+    color: #7C3AED;
     letter-spacing: 0.02em;
   }
 
   @media (min-width: 640px) {
     .pc-price-final {
-      font-size: 15px;
+      font-size: 16px;
     }
   }
 
   .pc-price-old {
     font-family: 'Barlow', sans-serif;
-    font-weight: 400;
-    font-size: 11px;
-    color: rgba(255,255,255,0.35);
+    font-weight: 500;
+    font-size: 12px;
+    color: #9CA3AF;
     text-decoration: line-through;
   }
 
@@ -234,54 +235,57 @@ const cardStyles = `
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    height: 30px;
-    border: 1px solid rgba(255,255,255,0.2);
-    background: transparent;
-    color: #fff;
+    gap: 6px;
+    height: 36px;
+    border: none;
+    background: #C4B5FD;
+    color: #6D28D9;
     font-family: 'Barlow', sans-serif;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    border-radius: 2px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(196, 181, 253, 0.3);
   }
 
   .pc-btn-cart:hover:not(:disabled) {
-    background: rgba(255,255,255,0.1);
-    border-color: rgba(255,255,255,0.5);
+    background: #DDD6FE;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(196, 181, 253, 0.4);
   }
 
   .pc-btn-cart:disabled {
-    opacity: 0.3;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 
   .pc-btn-cart.in-cart {
-    border-color: #d4af37;
-    color: #d4af37;
+    background: #E0E7FF;
+    color: #5B21B6;
   }
 
   .pc-btn-eye {
-    width: 30px;
-    height: 30px;
+    width: 36px;
+    height: 36px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(255,255,255,0.2);
-    background: transparent;
-    color: #fff;
-    border-radius: 2px;
+    border: 2px solid #E5E7EB;
+    background: #F3F4F6;
+    color: #6B7280;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
+    transition: all 0.3s;
   }
 
   .pc-btn-eye:hover {
-    background: rgba(255,255,255,0.1);
-    border-color: rgba(255,255,255,0.5);
+    border-color: #7C3AED;
+    background: #F9F5FF;
+    color: #7C3AED;
   }
 `;
 
@@ -319,7 +323,6 @@ function ProductoCard({
     removeCarrito,
   } = useUser();
   const router = useRouter();
-  const { trackProductClick } = useTracking();
   const { showToast } = useToast();
 
   const isFav = favoritos?.some((p) => p.id === producto.id);
@@ -356,7 +359,6 @@ function ProductoCard({
 
   const goToDetail = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    trackProductClick().catch(console.error);
     router.push(detailUrl);
   };
 

@@ -3,11 +3,10 @@
 
 User-agent: *
 Allow: /
-Allow: /productos
 Allow: /blogs
 Allow: /products-by-category
-Allow: /home/product-detail
-Allow: /home/cart
+Allow: /product-detail
+Allow: /cart
 Allow: /account/*
 
 # Evitar que crawleen admin
