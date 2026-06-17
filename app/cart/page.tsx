@@ -100,7 +100,7 @@ export default function CartPage() {
   };
 
   const handleGenerarOrden = async () => {
-    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "0962873167";
+    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "593996326003";
     const message = await generateWhatsAppMessage();
     window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
   };
@@ -290,9 +290,6 @@ export default function CartPage() {
                           Subtotal ({carrito.reduce((n, p) => n + (p.cantidad || 1), 0)} items)
                         </span>
                         <span>${subtotal.toFixed(2)}</span>
-                      </div>
-                      <div className="text-xs text-slate-400 dark:text-slate-500">
-                        Recargo del 7% (solo aplica pago con tarjetas)
                       </div>
                     </div>
                     <div className="border-t border-slate-100 dark:border-rgba(224, 161, 26, 0.1) mt-3 pt-3 flex justify-between font-bold text-base">
