@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminAuth } from "../../../../lib/firebase-admin";
-import { crearReservaStock } from "../../../../lib/stock-reserves-db";
-import { getRoleFromFirebaseClaims } from "../../../../lib/auth-roles";
+import { adminAuth } from "../../../lib/firebase-admin";
+import { crearReservaStock } from "../../../lib/stock-reserves-db";
+import { getRoleFromFirebaseClaims } from "../../../lib/auth-roles";
 
 export async function POST(req: NextRequest) {
   try {
