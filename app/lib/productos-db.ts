@@ -28,6 +28,7 @@ export interface Producto {
   marca?: string;
   bodegaId?: string;
   emprendedorId?: string;
+  emprendedorNombre?: string;
   extras?: { nombre: string; precio: string }[];
   destacado?: boolean;
   createdAt?: number | Date;
@@ -192,7 +193,7 @@ function cleanUndefinedDeep(obj: any): any {
 // Crear producto
 import { serverTimestamp } from "firebase/firestore";
 
-export async function crearProducto(producto: Producto, emprendedorId?: string): Promise<Producto> {
+export async function crearProducto(producto: Producto, emprendedorId?: string, emprendedorNombre?: string): Promise<Producto> {
   const cleanProducto = cleanUndefinedDeep(producto);
   // Agregar campo de fecha de creación (timestamp en ms para ordenamiento)
   const productoConFecha = {
@@ -200,9 +201,10 @@ export async function crearProducto(producto: Producto, emprendedorId?: string):
     createdAt: Date.now(),
     fechaCreacion: serverTimestamp(),
     ...(emprendedorId && { emprendedorId }),
+    ...(emprendedorNombre && { emprendedorNombre }),
   };
   const docRef = await addDoc(collection(db, COLLECTION), productoConFecha);
-  return { ...cleanProducto, id: docRef.id, createdAt: Date.now(), ...(emprendedorId && { emprendedorId }) };
+  return { ...cleanProducto, id: docRef.id, createdAt: Date.now(), ...(emprendedorId && { emprendedorId }), ...(emprendedorNombre && { emprendedorNombre }) };
 }
 
 // Obtener todos los productos

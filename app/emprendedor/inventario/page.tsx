@@ -26,6 +26,7 @@ export default function AdminInventario() {
   const [selectedSubcategoria, setSelectedSubcategoria] = useState<string | null>(null);
   const [categoriasDb, setCategoriasDb] = useState<any[]>([]);
   const [emprendedorId, setEmprendedorId] = useState<string | null>(null);
+  const [emprendedorNombre, setEmprendedorNombre] = useState<string | null>(null);
 
   function getStockTotal(producto: Producto) {
     const variantes = Array.isArray(producto.stockVariants) ? producto.stockVariants : [];
@@ -63,6 +64,7 @@ export default function AdminInventario() {
     // Obtener emprendedorId del usuario actual
     getCurrentUser().then((user) => {
       setEmprendedorId(user?.uid || null);
+      setEmprendedorNombre(user?.displayName || null);
     });
     
     fetchProductos();
@@ -241,7 +243,7 @@ export default function AdminInventario() {
                 if (editData) {
                   await actualizarProducto(editData.id, data);
                 } else {
-                  await crearProducto({ ...data, destacado: false }, emprendedorId || undefined);
+                  await crearProducto({ ...data, destacado: false }, emprendedorId || undefined, emprendedorNombre || undefined);
                 }
                 const prods = await obtenerProductos({ incluirSinStock: true, emprendedorId: emprendedorId || undefined });
                 setProductos(prods);

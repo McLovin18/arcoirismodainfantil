@@ -165,12 +165,13 @@ const cardStyles = `
     }
   }
 
-  /* nombre — bold negro ── */
+  /* nombre — bold negro, siempre reserva 2 líneas ── */
   .pc-name {
     font-family: 'Barlow', sans-serif;
     font-weight: 700;
     font-size: 13px;
     line-height: 1.3;
+    min-height: calc(1.3em * 2);
     color: #1F2937;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -183,7 +184,31 @@ const cardStyles = `
   @media (min-width: 640px) {
     .pc-name {
       font-size: 15px;
+      min-height: calc(1.3em * 2);
     }
+  }
+
+  /* creado por — dueño del emprendimiento ── */
+  .pc-owner {
+    font-family: 'Barlow', sans-serif;
+    font-weight: 500;
+    font-size: 11px;
+    line-height: 1.2;
+    color: #9CA3AF;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @media (min-width: 640px) {
+    .pc-owner {
+      font-size: 12px;
+    }
+  }
+
+  .pc-owner b {
+    font-weight: 600;
+    color: #9CA3AF;
   }
 
   /* precio */
@@ -309,7 +334,7 @@ function ProductoCard({
   showFav?: boolean;
   index?: number;
   isCompact?: boolean;
-} = {}): JSX.Element | null {
+} = {}): Element | null {
   if (!producto || !producto.id) return null;
 
   const {
@@ -340,6 +365,14 @@ function ProductoCard({
 
   const { basePrice, discount, hasDiscount, fakeOldPrice, finalPrice } =
     getCatalogPricing(producto);
+
+  // Nombre del dueño / emprendimiento dueño del producto
+  const ownerName =
+    producto?.emprendedorNombre ||    producto?.emprendimientoNombre ||
+    producto?.tiendaNombre ||
+    producto?.ownerName ||
+    producto?.vendedorNombre ||
+    null;
 
   const getDetailUrl = () => {
     let detailUrl = `/product-detail?id=${producto.id}`;
@@ -467,6 +500,12 @@ function ProductoCard({
           <div className="pc-info">
             <p className="pc-name">{producto.nombre}</p>
 
+            {ownerName && (
+              <p className="pc-owner">
+                Creado por: <b>{ownerName}</b>
+              </p>
+            )}
+
             <div className="pc-prices">
               {hasDiscount && (
                 <span className="pc-price-old">
@@ -520,6 +559,7 @@ function ProductoCard({
     </>
   );
 }
+
 
 export default React.memo(ProductoCard, (prevProps, nextProps) => {
   return (

@@ -159,7 +159,7 @@ const router = useRouter();
   }, []);
 
   const productosFiltrados = useMemo(() => {
-    return productos
+    const filtered = productos
       .filter((p: any) => {
         // Filtro por negocio
         if (filterNegocio && p.emprendedorId !== filterNegocio) {
@@ -236,6 +236,8 @@ const router = useRouter();
         if (a.createdAt && b.createdAt) return b.createdAt - a.createdAt;
         return 0;
       });
+    
+    return filtered;
   }, [
     productos,
     categoria,
@@ -325,28 +327,28 @@ const router = useRouter();
                 <button
                   type="button"
                   onClick={() => setShowNegocioDropdown(!showNegocioDropdown)}
-                  className={`${inputCls} flex items-center gap-2 min-w-[180px] justify-between`}
-                  style={{ borderColor: "#10b981", borderWidth: "2px", fontWeight: "600" }}
+                  className="flex items-center gap-2 min-w-[180px] justify-between px-4 py-2 rounded-xl border-2 font-semibold text-sm transition-all shadow-md hover:shadow-lg"
+                  style={{ borderColor: "#10b981", backgroundColor: filterNegocio ? "#10b981" : "white", color: filterNegocio ? "white" : "#10b981" }}
                 >
                   <span className="text-sm">
                     {filterNegocio
-                      ? emprendedores.find((e) => e.id === filterNegocio)?.displayName || "Negocio"
+                      ? emprendedores.find((e) => e.uid === filterNegocio)?.displayName || "Negocio"
                       : "Todos los negocios"}
                   </span>
-                  <span className="material-icons-round text-green-500 text-[18px]">
+                  <span className="material-icons-round text-[18px]">
                     {showNegocioDropdown ? "expand_less" : "expand_more"}
                   </span>
                 </button>
 
                 {showNegocioDropdown && (
-                  <div className="absolute right-0 top-full mt-2 w-full min-w-[200px] bg-white rounded-xl shadow-xl border-2 border-green-500 z-50 max-h-[300px] overflow-y-auto">
+                  <div className="absolute right-0 top-full mt-2 w-full min-w-[200px] rounded-xl shadow-xl border-2 border-green-500 z-50 max-h-[350px] overflow-y-auto" style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)" }}>
                     <button
                       type="button"
                       onClick={() => {
                         setFilterNegocio("");
                         setShowNegocioDropdown(false);
                       }}
-                      className="w-full px-4 py-3 text-left text-sm hover:bg-green-50 transition-colors border-b border-gray-100"
+                      className="w-full px-4 py-3 text-left text-sm font-semibold text-slate-700 hover:bg-green-500 hover:text-white transition-all border-b border-green-200"
                     >
                       🏪 Todos los negocios
                     </button>
@@ -355,10 +357,10 @@ const router = useRouter();
                         key={emp.id}
                         type="button"
                         onClick={() => {
-                          setFilterNegocio(emp.id);
+                          setFilterNegocio(emp.uid);
                           setShowNegocioDropdown(false);
                         }}
-                        className="w-full px-4 py-3 text-left text-sm hover:bg-green-50 transition-colors border-b border-gray-100 last:border-b-0"
+                        className="w-full px-4 py-3 text-left text-sm font-medium text-slate-700 hover:bg-green-500 hover:text-white transition-all border-b border-green-200 last:border-b-0"
                       >
                         {emp.displayName || "Negocio"}
                       </button>
