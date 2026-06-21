@@ -20,7 +20,7 @@ const publicItems = [
   { name: "Inicio", path: "/", icon: "home" },
   { name: "Productos", path: "/productos", icon: "shopping_bag" },
   { name: "Reservas", path: "/reservas", icon: "restaurant_menu" },
-  { name: "Carrito", path: "/carrito", icon: "shopping_cart" },
+  { name: "Carrito", path: "/cart", icon: "shopping_cart" },
 ];
 
 export default function BottomBar({ role = "admin", tipoEmprendimiento = null }: { role?: string; tipoEmprendimiento?: string | null }) {

@@ -5,7 +5,6 @@ import { obtenerBodegas } from "../lib/bodegas-db";
 import { useRouter } from "next/navigation";
 import { getSnapshotPricing } from "../lib/pricing";
 import { useUser } from "../context/UserContext";
-import BottomBarPublic from "../components/BottomBarPublic";
 import { obtenerAtributos } from "../lib/atributos-db";
 
 function resolveCartItemKey(item: any) {
@@ -387,7 +386,6 @@ export default function CartPage() {
           )}
         </main>
       </div>
-      {!isLogged && <BottomBarPublic />}
     </>
   );
 }

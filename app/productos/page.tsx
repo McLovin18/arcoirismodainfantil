@@ -59,12 +59,28 @@ const router = useRouter();
   const [orden, setOrden] = useState("price-high");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [categorias, setCategorias] = useState<any[]>([]);
+  const [emprendedores, setEmprendedores] = useState<any[]>([]);
+  const [filterNegocio, setFilterNegocio] = useState("");
   const categoriesScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const categoriasRef = collection(db, "categorias");
     const unsubscribe = onSnapshot(query(categoriasRef), (snapshot) => {
       setCategorias(sortCategoriasByOrder(mapCategorySnapshot(snapshot.docs)));
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const emprendedoresRef = collection(db, "emprendedores");
+    const unsubscribe = onSnapshot(query(emprendedoresRef), (snapshot) => {
+      const allEmprendedores = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+      // Filtrar solo emprendedores de venta de productos (no comida)
+      const productosEmprendedores = allEmprendedores.filter((emp: any) => {
+        const tipo = (emp.tipoEmprendimiento || "").toLowerCase();
+        return !tipo.includes("comida") && !tipo.includes("alimento") && !tipo.includes("food");
+      });
+      setEmprendedores(productosEmprendedores);
     });
     return () => unsubscribe();
   }, []);
@@ -144,6 +160,11 @@ const router = useRouter();
   const productosFiltrados = useMemo(() => {
     return productos
       .filter((p: any) => {
+        // Filtro por negocio
+        if (filterNegocio && p.emprendedorId !== filterNegocio) {
+          return false;
+        }
+
         if (categoria && categorias.length > 0) {
           if (!productMatchesCategoria(p, categoria, categorias)) return false;
         } else if (categoria && !sameCategoryId(p.categoria, categoria)) {
@@ -224,6 +245,7 @@ const router = useRouter();
     precioMin,
     precioMax,
     orden,
+    filterNegocio,
   ]);
 
   const getProductsPerPage = () => {
@@ -254,7 +276,7 @@ const router = useRouter();
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [productosFiltrados.length, categoria, subcategoria, subsubcategoria, search, precioMin, precioMax]);
+  }, [productosFiltrados.length, categoria, subcategoria, subsubcategoria, search, precioMin, precioMax, filterNegocio]);
 
   const hasFilters = !!(search || precioMin || precioMax || orden !== "newest");
 
@@ -269,14 +291,14 @@ const router = useRouter();
     "px-3 py-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-#e8c862 transition-all";
 
   return (
-    <div className="min-h-screen flex flex-col text-slate-900 dark:text-white transition-colors" style={{ background: "linear-gradient(135deg, #FFFBF8 0%, #FFFACD 100%)" }}>
+    <div className="min-h-screen flex flex-col text-slate-900 dark:text-white transition-colors" style={{ background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)" }}>
       <main className="max-w-7xl mx-auto w-full px-3 sm:px-5 py-6 sm:py-15 flex-1">
 
 
-        <div className="rounded-3xl px-4 py-3.5 mb-5 space-y-3 shadow-lg" style={{ background: "linear-gradient(90deg, rgba(255,105,180,0.1) 0%, rgba(255,184,77,0.1) 50%, rgba(206,147,216,0.1) 100%)", border: "2px solid rgba(255,105,180,0.3)" }}>
+        <div className="rounded-3xl px-4 py-3.5 mb-5 space-y-3 shadow-lg" style={{ background: "linear-gradient(90deg, rgba(59,130,246,0.1) 0%, rgba(16,185,129,0.1) 100%)", border: "2px solid rgba(59,130,246,0.3)" }}>
           <div className="flex flex-wrap gap-2 items-center">
             <div className="relative flex-1 min-w-40 max-w-[min(75vw,300px)] sm:max-w-sm">
-              <span className="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-arco-pink text-[17px] pointer-events-none">
+              <span className="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 text-[17px] pointer-events-none">
                 search
               </span>
               <input
@@ -285,12 +307,12 @@ const router = useRouter();
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className={`${inputCls} w-full pl-9 pr-8`}
-                style={{ borderColor: "#FFB84D", borderWidth: "2px", fontWeight: "600" }}
+                style={{ borderColor: "#3b82f6", borderWidth: "2px", fontWeight: "600" }}
               />
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-arco-orange hover:text-arco-pink"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-blue-500 hover:text-green-500"
                 >
                   <span className="material-icons-round text-[15px]">close</span>
                 </button>
@@ -307,11 +329,11 @@ const router = useRouter();
                 onClick={selectTodas}
                 className={`px-4 py-2 rounded-full whitespace-nowrap font-bold text-sm transition-all shadow-md hover:shadow-lg ${
                   !categoria
-                    ? "bg-black text-white border-2 border-black scale-105"
-                    : "bg-white text-black border-2 border-black hover:shadow-md"
+                    ? "bg-blue-500 text-white border-2 border-blue-500 scale-105"
+                    : "bg-white text-black border-2 border-blue-500 hover:shadow-md"
                 }`}
               >
-                🌈 Todas
+                � Todas
               </button>
               {categorias.map((cat, idx) => {
                 return (
@@ -321,8 +343,8 @@ const router = useRouter();
                     onClick={() => selectCategoria(cat.id)}
                     className={`px-4 py-2 rounded-full whitespace-nowrap font-bold text-sm transition-all shadow-md hover:shadow-lg ${
                       sameCategoryId(categoria, cat.id)
-                        ? "bg-black text-white border-2 border-black scale-105"
-                        : "bg-white text-black border-2 border-black"
+                        ? "bg-blue-500 text-white border-2 border-blue-500 scale-105"
+                        : "bg-white text-black border-2 border-blue-500"
                     }`}
                   >
                     {cat.icono && <span className="mr-1">✨</span>}
@@ -334,12 +356,46 @@ const router = useRouter();
           </div>
         )}
 
+        {emprendedores.length > 0 && (
+          <div className="mb-6 overflow-x-auto pb-2">
+            <div className="flex gap-2 min-w-max">
+              <button
+                type="button"
+                onClick={() => setFilterNegocio("")}
+                className={`px-4 py-2 rounded-full whitespace-nowrap font-bold text-sm transition-all shadow-md hover:shadow-lg ${
+                  !filterNegocio
+                    ? "bg-green-500 text-white border-2 border-green-500 scale-105"
+                    : "bg-white text-black border-2 border-green-500 hover:shadow-md"
+                }`}
+              >
+                🏪 Todos los negocios
+              </button>
+              {emprendedores.map((emp) => {
+                return (
+                  <button
+                    key={emp.id}
+                    type="button"
+                    onClick={() => setFilterNegocio(emp.id)}
+                    className={`px-4 py-2 rounded-full whitespace-nowrap font-bold text-sm transition-all shadow-md hover:shadow-lg ${
+                      filterNegocio === emp.id
+                        ? "bg-green-500 text-white border-2 border-green-500 scale-105"
+                        : "bg-white text-black border-2 border-green-500"
+                    }`}
+                  >
+                    {emp.displayName || "Negocio"}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {loading ? (
   <div className="grid grid-cols-2 gap-2 lg:grid-cols-5">
     {Array.from({ length: 10 }).map((_, i) => (
-      <div key={i} className="rounded-2xl overflow-hidden bg-white shadow-lg animate-pulse border-2" style={{ borderColor: ["#FF69B4", "#FFB84D", "#FFE082", "#CE93D8", "#81D4FA"][i % 5] }}>
+      <div key={i} className="rounded-2xl overflow-hidden bg-white shadow-lg animate-pulse border-2" style={{ borderColor: ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"][i % 5] }}>
         {/* Imagen placeholder */}
-        <div className="w-full h-32 sm:h-48 bg-gradient-to-br" style={{ background: ["linear-gradient(45deg, #FFC0E0 0%, #FFB84D 100%)", "linear-gradient(45deg, #FFE082 0%, #CE93D8 100%)", "linear-gradient(45deg, #81D4FA 0%, #FF69B4 100%)", "linear-gradient(45deg, #CE93D8 0%, #FFE082 100%)", "linear-gradient(45deg, #FF69B4 0%, #81D4FA 100%)"][i % 5] }} />
+        <div className="w-full h-32 sm:h-48 bg-gradient-to-br" style={{ background: ["linear-gradient(45deg, #93c5fd 0%, #10b981 100%)", "linear-gradient(45deg, #86efac 0%, #3b82f6 100%)", "linear-gradient(45deg, #fcd34d 0%, #10b981 100%)", "linear-gradient(45deg, #f87171 0%, #3b82f6 100%)", "linear-gradient(45deg, #a78bfa 0%, #10b981 100%)"][i % 5] }} />
         {/* Contenido placeholder */}
         <div className="p-1.5 sm:p-4 flex flex-col gap-2">
           <div className="h-4 bg-slate-200 rounded w-3/4" />
@@ -351,13 +407,13 @@ const router = useRouter();
   </div>
   ) : productosFiltrados.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-arco-pink to-arco-purple flex items-center justify-center shadow-lg">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center shadow-lg">
               <span className="material-icons-round text-3xl text-white">
                 mood
               </span>
             </div>
             <div>
-              <p className="font-bold text-lg text-arco-pink">Sin resultados 😢</p>
+              <p className="font-bold text-lg text-blue-500">Sin resultados 😢</p>
               <p className="text-sm text-slate-600 mt-1 max-w-60">
                 {categoria
                   ? `No hay productos en "${categorias.find((c) => sameCategoryId(c.id, categoria))?.nombre || "esta categoría"}".`
@@ -368,7 +424,7 @@ const router = useRouter();
               <button
                 onClick={clearFilters}
                 className="text-sm font-bold text-white py-2 px-6 rounded-full transition-transform hover:scale-110 shadow-lg"
-                style={{ background: "linear-gradient(90deg, #FF69B4 0%, #FFB84D 100%)" }}
+                style={{ background: "linear-gradient(90deg, #3b82f6 0%, #10b981 100%)" }}
               >
                 🔄 Limpiar filtros
               </button>
@@ -396,7 +452,7 @@ const router = useRouter();
             {totalPages > 1 && (
               <div className="flex flex-wrap justify-center items-center gap-2 mt-8 select-none w-full">
                 <button
-                  className="px-3 py-1.5 rounded border text-xs font-medium bg-white border-slate-300 text-slate-900 hover:border-black/60 transition-all disabled:opacity-40"
+                  className="px-3 py-1.5 rounded border text-xs font-medium bg-white border-blue-300 text-slate-900 hover:border-blue-500 transition-all disabled:opacity-40"
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
                 >
@@ -405,14 +461,14 @@ const router = useRouter();
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
                   <button
                     key={n}
-                    className={`px-3 py-1.5 rounded border text-xs font-medium transition-all ${currentPage === n ? "bg-black border-black text-white shadow-sm" : "bg-white border-slate-300 text-slate-900 hover:border-black/60"}`}
+                    className={`px-3 py-1.5 rounded border text-xs font-medium transition-all ${currentPage === n ? "bg-blue-500 border-blue-500 text-white shadow-sm" : "bg-white border-blue-300 text-slate-900 hover:border-blue-500"}`}
                     onClick={() => setCurrentPage(n)}
                   >
                     {n}
                   </button>
                 ))}
                 <button
-                  className="px-3 py-1.5 rounded border text-xs font-medium bg-white border-slate-300 text-slate-900 hover:border-black/60 transition-all disabled:opacity-40"
+                  className="px-3 py-1.5 rounded border text-xs font-medium bg-white border-blue-300 text-slate-900 hover:border-blue-500 transition-all disabled:opacity-40"
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
                 >
