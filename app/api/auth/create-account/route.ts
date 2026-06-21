@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminAuth, db } from "../../../lib/firebase-admin";
-import { checkRateLimit, markRegistrationSuccess, isEmailRegistrationBlocked, normalizeIp } from "../../../lib/rate-limit-v2";
+// import { checkRateLimit, markRegistrationSuccess, isEmailRegistrationBlocked, normalizeIp } from "../../../lib/rate-limit-v2";
 
 function getClientIp(req: NextRequest): string {
   const forwardedFor = req.headers.get("x-forwarded-for");
@@ -16,42 +16,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Email y password son requeridos" }, { status: 400 });
     }
 
-    // Obtener IP del cliente
-    const ip = normalizeIp(getClientIp(req));
-    
-    // CHEQUEO 1: ¿Está este email bloqueado por registro previo?
-    const isBlocked = await isEmailRegistrationBlocked(email.trim().toLowerCase());
-    if (isBlocked) {
-      console.warn(`[create-account] Email ya registrado recientemente: ${email}`);
-      return NextResponse.json(
-        {
-          error: "Este email se registró recientemente. Intenta en 5 minutos.",
-          retryAfter: 300,
-        },
-        { status: 429, headers: { "Retry-After": "300" } }
-      );
-    }
-    
-    // CHEQUEO 2: Multi-capa rate limit (Email + IP)
-    const rateLimit = await checkRateLimit(
-      email.trim().toLowerCase(),
-      ip,
-      "register"
-    );
-    
-    if (!rateLimit.allowed) {
-      console.warn(`[create-account] Rate limit: ${rateLimit.reason}`);
-      return NextResponse.json(
-        {
-          error: rateLimit.reason,
-          retryAfter: rateLimit.retryAfter,
-        },
-        { status: 429, headers: { "Retry-After": String(rateLimit.retryAfter || 300) } }
-      );
-    }
-
     const normalizedEmail = email.trim().toLowerCase();
 
+    // Verificar si el email está pre-aprobado por el admin antes de aplicar rate limiting
     const pendingSnapshot = await db
       .collection("emprendedores")
       .where("email", "==", normalizedEmail)
@@ -74,6 +41,46 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
+
+    // Solo aplicar rate limiting si no está pre-aprobado por admin
+    // Para emprendedores invitados, desactivamos el rate limiting
+    
+    // CHEQUEO 1: ¿Está este email bloqueado por registro previo?
+    // Desactivado temporalmente para emprendedores pre-aprobados
+    /*
+    const isBlocked = await isEmailRegistrationBlocked(normalizedEmail);
+    if (isBlocked) {
+      console.warn(`[create-account] Email ya registrado recientemente: ${email}`);
+      return NextResponse.json(
+        {
+          error: "Este email se registró recientemente. Intenta en 5 minutos.",
+          retryAfter: 300,
+        },
+        { status: 429, headers: { "Retry-After": "300" } }
+      );
+    }
+    */
+    
+    // CHEQUEO 2: Multi-capa rate limit (Email + IP)
+    // Desactivado temporalmente para emprendedores pre-aprobados
+    /*
+    const rateLimit = await checkRateLimit(
+      normalizedEmail,
+      getClientIp(req),
+      "register"
+    );
+    
+    if (!rateLimit.allowed) {
+      console.warn(`[create-account] Rate limit: ${rateLimit.reason}`);
+      return NextResponse.json(
+        {
+          error: rateLimit.reason,
+          retryAfter: rateLimit.retryAfter,
+        },
+        { status: 429, headers: { "Retry-After": String(rateLimit.retryAfter || 300) } }
+      );
+    }
+    */
 
     // Evitar invitaciones duplicadas cuando el email ya existe en Auth
     try {
@@ -108,7 +115,8 @@ export async function POST(req: NextRequest) {
     });
 
     // ÉXITO: Bloquear email por 7 días (anti-spam)
-    await markRegistrationSuccess(normalizedEmail, 7);
+    // Desactivado temporalmente para emprendedores pre-aprobados
+    // await markRegistrationSuccess(normalizedEmail, 7);
 
     console.log(`[create-account] ✅ ${userRecord.email}`);
 
